@@ -1,110 +1,89 @@
-# Q-Learning Maze Escape
+# Maze Runner Reinforcement Learning Project
 
-This is a beginner-friendly reinforcement learning project in Python. The goal is to train an agent to escape a small maze using **Q-learning**, one of the simplest and most useful reinforcement learning algorithms.
+This is a beginner-friendly reinforcement learning project in Python.
 
-The agent starts at `S`, explores the maze, learns from rewards and penalties, then eventually finds a good path to the goal `G`.
+The agent learns how to escape a small maze using **Q-learning**.
 
-![Final learned path](maze_escape_final_path.gif)
+## What the final solution looks like
 
-## What this project teaches
+The agent starts at `S`, avoids the walls marked as `X` and reaches the goal `G`.
 
-This project introduces the basic ideas behind reinforcement learning:
+![Final learned maze solution animation](assets/final_solution.gif)
 
-- **Agent**: the learner moving through the maze
-- **Environment**: the maze grid
-- **State**: the agent's current location in the maze
-- **Action**: moving up, down, left or right
-- **Reward**: feedback after each move
-- **Policy**: the learned strategy for choosing actions
-- **Q-table**: a table that stores how useful each action is from each state
-- **Exploration vs exploitation**: trying random moves versus using what has already been learned
+The animation shows the agent moving from `S` to `G`. The blue line shows the learned path after training.
 
-## Maze setup
+## Simplified learned Q-matrix
 
-The maze is a 5 by 5 grid:
+The actual Q-table stores four values per cell:
 
 ```text
-S . . . .
-. X X . .
-. . . X .
-. X . . .
-. . . . G
+[Up, Down, Left, Right]
 ```
 
-Where:
+To make it easier to read, this project also prints a simplified matrix showing only the best action and the best Q-value for each cell.
+
+![Simplified best action Q-matrix](assets/best_q_matrix.png)
+
+## Project structure
 
 ```text
-S = Start
-G = Goal
-X = Wall
-. = Open space
-A = Agent
-* = Visited path
+maze_rl_project/
+├── maze_env.py
+├── agent.py
+├── train.py
+├── README.md
+└── assets/
+    ├── final_solution.gif
+    ├── final_solution.png
+    └── best_q_matrix.png
 ```
 
-## Reward system
+## File overview
 
-The agent receives rewards or penalties based on what happens after each move:
+### `maze_env.py`
 
-| Result | Reward |
-|---|---:|
-| Move to open space | -1 |
-| Hit a wall or boundary | -5 |
-| Reach the goal | +10 |
+This file contains the environment.
 
-The small negative reward for each move encourages the agent to find a shorter path.
-
-## How Q-learning works in this code
-
-The code uses a Q-table with one value for every possible action from every cell in the maze.
-
-For each step, the agent chooses an action using an epsilon-greedy strategy:
-
-- Sometimes it explores by picking a random action.
-- Most of the time it exploits what it has already learned by choosing the action with the highest Q-value.
-
-After each move, the Q-table is updated using:
+The environment controls:
 
 ```text
-Q(s, a) = Q(s, a) + alpha * (reward + gamma * max(Q(next_state)) - Q(s, a))
+maze layout
+start position
+goal position
+walls
+rewards
+movement rules
+terminal display
 ```
 
-In simple words, the agent updates its memory based on:
+It does **not** contain Q-learning logic.
 
-- what it expected to happen
-- what actually happened
-- how good the next state looks
+### `agent.py`
 
-## Main parameters
+This file contains the Q-learning agent.
 
-```python
-alpha = 0.1       # learning rate
-gamma = 0.9       # importance of future rewards
-epsilon = 0.2     # chance of taking a random action
-episodes = 5000   # number of training rounds
-```
-
-### What these mean
-
-- `alpha` controls how quickly the agent updates what it knows.
-- `gamma` controls how much the agent cares about future rewards.
-- `epsilon` controls how often the agent explores random moves.
-- `episodes` controls how many times the agent trains from start to goal.
-
-## Terminal animation
-
-During training, the code shows selected episodes step by step. This helps you see the agent move through the maze while it is still learning.
-
-At the end, the code shows the final learned path from `S` to `G`.
-
-Example final path:
+The agent controls:
 
 ```text
-S . . . .
-* X X . .
-* * * X .
-. X * * *
-. . . . G
+Q-table
+action selection
+exploration vs exploitation
+Q-value updates
+Q-table display
+```
+
+### `train.py`
+
+This file connects the environment and the agent.
+
+It:
+
+```text
+runs training episodes
+shows step-by-step training animation
+prints Q-value updates
+shows the final learned path
+prints the final full Q-table
 ```
 
 ## How to run
@@ -115,34 +94,99 @@ Install NumPy:
 pip install numpy
 ```
 
-Run the script:
+Then run:
 
 ```bash
-python maze_rl.py
+python train.py
 ```
 
-## Suggested file structure
+## Maze
+
+The maze is:
 
 ```text
-q-learning-maze-escape/
-├── maze_rl.py
-├── README.md
-└── maze_escape_final_path.gif
+S . . . .
+. X X . .
+. . . X .
+. X . . .
+. . . . G
 ```
 
-## Ideas to improve it
+Legend:
 
-Once the basic version works, try these upgrades:
+```text
+S = start
+G = goal
+X = wall
+A = agent
+* = visited path
+```
 
-- Make the maze bigger.
-- Add more walls.
-- Add traps with large negative rewards.
-- Randomize the start and goal positions.
-- Save the Q-table after training.
-- Plot total reward over time.
-- Compare different values of `alpha`, `gamma` and `epsilon`.
-- Use Pygame to make a nicer visual version.
+## How the Q-table works
 
-## Why this is a good first reinforcement learning project
+The Q-table has this shape:
 
-This project is small enough to understand line by line, but it still contains the most important parts of reinforcement learning. Before using advanced libraries or neural networks, this project helps you understand what the agent is actually learning.
+```text
+rows x columns x actions
+```
+
+For this maze:
+
+```text
+5 x 5 x 4
+```
+
+Each open cell stores four values:
+
+```text
+[Up, Down, Left, Right]
+```
+
+For example:
+
+```text
+Cell (4,3) = [8.50, -0.10, 5.00, 10.00]
+```
+
+This means:
+
+```text
+Up    =  8.50
+Down  = -0.10
+Left  =  5.00
+Right = 10.00
+```
+
+The best action from that cell is `Right`, because `10.00` is the largest value.
+
+## Core learning loop
+
+The training loop follows this pattern:
+
+```python
+state = env.reset()
+
+while not done:
+    action = agent.choose_action(state)
+    next_state, reward, done = env.step(action)
+    agent.update(state, action, reward, next_state)
+    state = next_state
+```
+
+That is the basic reinforcement learning cycle:
+
+```text
+state -> action -> reward -> next state -> update knowledge
+```
+
+## What to try next
+
+Good next experiments:
+
+```text
+change the maze layout
+change the reward values
+increase or decrease epsilon
+try a larger maze
+compare Q-learning with SARSA
+```
