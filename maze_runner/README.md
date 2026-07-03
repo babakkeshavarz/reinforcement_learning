@@ -139,3 +139,43 @@ The training plots come from the actual Q-learning and SARSA training.
 For the final GIFs, the visualizer first tries the learned greedy policy. If the
 policy gets stuck in a loop on a difficult randomized maze, it falls back to a
 safe valid route so the GIF still reaches the goal.
+
+
+
+## Hyperparameter Experiments
+
+The `hyperparameter_experiments/` project compares Q-learning and SARSA across different values of:
+
+```text
+alpha
+gamma
+epsilon
+```
+
+Run it:
+
+```bash
+cd hyperparameter_experiments
+pip install -r requirements.txt
+python run_experiments.py
+python plot_results.py
+python analyze_results.py
+```
+
+## Example outputs
+
+### Top reward settings
+
+![Top reward settings](hyperparameter_experiments/assets/top_reward_settings.png)
+
+### Epsilon effect
+
+![Epsilon vs reward](hyperparameter_experiments/assets/epsilon_vs_reward.png)
+
+### Q-learning heatmap
+
+![Q-learning alpha epsilon heatmap](hyperparameter_experiments/assets/q_learning_alpha_epsilon_heatmap.png)
+
+### SARSA heatmap
+
+![SARSA alpha epsilon heatmap](hyperparameter_experiments/assets/sarsa_alpha_epsilon_heatmap.png)
