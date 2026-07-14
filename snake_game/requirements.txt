@@ -1,0 +1,7 @@
+pygame
+pillow
+imageio
+imageio-ffmpeg
+pandas
+matplotlib
+torch

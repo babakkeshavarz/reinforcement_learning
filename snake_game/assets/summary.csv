@@ -1,0 +1,4 @@
+algorithm,avg_score_last_100,best_score,avg_reward_last_100
+Q-learning,14.82,32,-404.595
+SARSA,12.65,32,-339.3905000000001
+DQN,1.65,21,-108.59400000000001
